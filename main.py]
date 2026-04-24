@@ -1,0 +1,198 @@
+import os
+import traceback
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+import stripe
+
+load_dotenv()
+
+app = FastAPI()
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+PRICE_MAP = {
+    "standard": "price_1TP6bjRymXQ1NPXw1JfHdxMZ",
+    "pro": "price_1TP6dARymXQ1NPXwPivUepu8",
+    "business": "price_1TP6dTRymXQ1NPXwd8KYb1D9",
+}
+
+BASE_URL = "http://127.0.0.1:8000"
+USERS = []
+
+
+@app.get("/", response_class=HTMLResponse)
+def home():
+    return """
+    <html>
+    <body>
+        <h1>音声文字起こしAI</h1>
+        <ul>
+            <li><a href="/buy/standard">standard を購入</a></li>
+            <li><a href="/buy/pro">pro を購入</a></li>
+            <li><a href="/buy/business">business を購入</a></li>
+        </ul>
+        <p><a href="/users">users確認</a></p>
+        <p><a href="/health">health確認</a></p>
+    </body>
+    </html>
+    """
+
+
+@app.get("/users")
+def get_users():
+    return {
+        "count": len(USERS),
+        "users": USERS,
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "ok",
+        "stripe_api_key_loaded": bool(stripe.api_key),
+        "webhook_secret_loaded": bool(WEBHOOK_SECRET),
+    }
+
+
+@app.get("/success", response_class=HTMLResponse)
+def success(session_id: str | None = None, plan: str | None = None):
+    return f"""
+    <html>
+    <body>
+        <h2>決済成功</h2>
+        <p>session_id: {session_id}</p>
+        <p>plan: {plan}</p>
+        <p><a href="/">トップへ戻る</a></p>
+        <p><a href="/users">users確認</a></p>
+    </body>
+    </html>
+    """
+
+
+@app.get("/cancel", response_class=HTMLResponse)
+def cancel():
+    return """
+    <html>
+    <body>
+        <h2>決済キャンセル</h2>
+        <p><a href="/">トップへ戻る</a></p>
+    </body>
+    </html>
+    """
+
+
+@app.get("/buy/{plan}")
+def buy(plan: str):
+    try:
+        print("=== /buy called ===")
+        print("plan =", plan)
+
+        if not stripe.api_key:
+            raise Exception("STRIPE_SECRET_KEY が読み込めていません")
+
+        if plan not in PRICE_MAP:
+            raise HTTPException(status_code=404, detail="Unknown plan")
+
+        price_id = PRICE_MAP[plan]
+        print("price_id =", price_id)
+
+        session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{"price": price_id, "quantity": 1}],
+            mode="subscription",
+            success_url=f"{BASE_URL}/success?plan={plan}&session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{BASE_URL}/cancel",
+        )
+
+        print("session.id =", session.id)
+        print("session.url =", session.url)
+
+        return RedirectResponse(session.url, status_code=303)
+
+    except stripe.error.StripeError as e:
+        print("=== STRIPE ERROR ===")
+        print("type =", type(e).__name__)
+        print("user_message =", getattr(e, "user_message", None))
+        print("code =", getattr(e, "code", None))
+        print("param =", getattr(e, "param", None))
+        print("http_status =", getattr(e, "http_status", None))
+        print("json_body =", getattr(e, "json_body", None))
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"BUY ERROR: {str(e)}")
+
+    except Exception as e:
+        print("=== GENERAL ERROR ===")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"BUY ERROR: {str(e)}")
+
+
+@app.post("/stripe-webhook")
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+
+    try:
+        if not WEBHOOK_SECRET:
+            raise Exception("STRIPE_WEBHOOK_SECRET が読み込めていません")
+
+        event = stripe.Webhook.construct_event(
+            payload=payload,
+            sig_header=sig_header,
+            secret=WEBHOOK_SECRET,
+        )
+    except Exception as e:
+        print("=== WEBHOOK SIGNATURE ERROR ===")
+        print(repr(e))
+        traceback.print_exc()
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+    try:
+        event_type = event["type"]
+        obj = event["data"]["object"]
+
+        print("=== WEBHOOK RECEIVED ===")
+        print("event type =", event_type)
+        print("object type =", obj.get("object"))
+        print("object id =", obj.get("id"))
+
+        # checkout.session.completed 以外は全部無視して 200 を返す
+        if event_type != "checkout.session.completed":
+            print("ignored event =", event_type)
+            return JSONResponse(
+                {"ok": True, "ignored": event_type},
+                status_code=200
+            )
+
+        # checkout.session.completed のときだけ保存
+        print("🔥 HIT checkout.session.completed 🔥")
+
+        customer_id = obj.get("customer")
+        subscription_id = obj.get("subscription")
+        customer_email = (obj.get("customer_details") or {}).get("email")
+
+        USERS.append({
+            "email": customer_email,
+            "stripe_customer_id": customer_id,
+            "stripe_subscription_id": subscription_id,
+            "source_event": "checkout.session.completed",
+        })
+
+        print("saved user =", customer_email)
+
+        return JSONResponse(
+            {
+                "ok": True,
+                "saved": customer_email,
+                "event": event_type,
+            },
+            status_code=200
+        )
+
+    except Exception as e:
+        print("=== WEBHOOK HANDLER ERROR ===")
+        print(repr(e))
+        traceback.print_exc()
+        return JSONResponse({"error": str(e)}, status_code=500)

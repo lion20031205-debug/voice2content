@@ -1,0 +1,30 @@
+{
+  "demo_free": {
+    "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+    "plan": "free",
+    "monthly_usage": {},
+    "stripe_customer_id": "",
+    "stripe_subscription_id": ""
+  },
+  "demo_standard": {
+    "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+    "plan": "standard",
+    "monthly_usage": {},
+    "stripe_customer_id": "",
+    "stripe_subscription_id": ""
+  },
+  "demo_pro": {
+    "password_hash": "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4",
+    "plan": "pro",
+    "monthly_usage": {},
+    "stripe_customer_id": "",
+    "stripe_subscription_id": ""
+  },
+  "zazaza": {
+    "password_hash": "34a075d76878f5e0b0a040658544ea9888844f82f3ac8d8dd10065b2da4c1cb8",
+    "plan": "free",
+    "monthly_usage": {},
+    "stripe_customer_id": "cus_UNsmggV0XRCsxi",
+    "stripe_subscription_id": ""
+  }
+}
