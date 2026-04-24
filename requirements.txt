@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+python-multipart
+openai
+stripe
+passlib
+itsdangerous
+mutagen
