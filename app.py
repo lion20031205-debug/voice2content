@@ -38,9 +38,9 @@ SERVICE_NAME_JP = "Voice2Content（ボイコン）"
 SERVICE_TAGLINE = "喋るだけでコンテンツ完成。"
 
 PRICE_MAP = {
-    "standard": "price_1TP6bjRymXQ1NPXw1JfHdxMZ",
-    "pro": "price_1TP6dARymXQ1NPXwPivUepu8",
-    "business": "price_1TP6dTRymXQ1NPXwd8KYb1D9",
+    "standard": "price_1TQEtgRoLzdrUUOZ9FKsuYhW",
+    "pro": "price_1TQEteRoLzdrUUOZZ5o9IzG3",
+    "business": "price_1TQEteRoLzdrUUOZmHJ2JZPU",
 }
 
 PLAN_LIMITS_SECONDS = {
