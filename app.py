@@ -1035,6 +1035,78 @@ def cancel():
     <a class="btn" href="/dashboard">戻る</a>
     """))
 
+@app.get("/legal", response_class=HTMLResponse)
+def legal_page():
+    return HTMLResponse(page("特定商取引法に基づく表記", """
+    <div class="card">
+        <h1>特定商取引法に基づく表記</h1>
+
+        <table style="width:100%; border-collapse:collapse;">
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px; width:30%;">販売事業者</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">Voice2Content</td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">運営責任者</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">泉</td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">所在地</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">大阪府大阪市</td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">メールアドレス</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">support@voice2contentai.com</td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">販売URL</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">https://app.voice2contentai.com</td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">販売価格</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">各プランページに表示された金額</td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">商品・サービス内容</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">
+                    音声ファイルをアップロードすることで、自動文字起こし、SNS投稿文生成、
+                    YouTubeショート台本生成、ブログ記事生成、要約生成などを行うWebサービスです。
+                </td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">支払方法</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">クレジットカード決済（Stripe）</td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">サービス提供時期</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">決済完了後、直ちに利用可能</td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">返品・キャンセル</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">
+                    デジタルサービスの性質上、決済後の返金には原則対応しておりません。
+                    サブスクリプションは次回更新日前までに解約できます。
+                </td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">追加料金</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">
+                    インターネット通信料はお客様のご負担となります。
+                </td>
+            </tr>
+            <tr>
+                <th style="border:1px solid #f3d9c5; padding:12px;">動作環境</th>
+                <td style="border:1px solid #f3d9c5; padding:12px;">
+                    インターネット接続環境およびWebブラウザが必要です。
+                </td>
+            </tr>
+        </table>
+
+        <br>
+        <a class="btn sub" href="/">トップへ戻る</a>
+    </div>
+    """))
+
 
 @app.post("/stripe-webhook")
 async def stripe_webhook(request: Request):
