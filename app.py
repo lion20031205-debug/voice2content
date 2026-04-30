@@ -1035,78 +1035,6 @@ def cancel():
     <a class="btn" href="/dashboard">戻る</a>
     """))
 
-@app.get("/legal", response_class=HTMLResponse)
-def legal_page():
-    return HTMLResponse(page("特定商取引法に基づく表記", """
-    <div class="card">
-        <h1>特定商取引法に基づく表記</h1>
-
-        <table style="width:100%; border-collapse:collapse;">
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px; width:30%;">販売事業者</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">Voice2Content</td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">運営責任者</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">泉</td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">所在地</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">大阪府大阪市</td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">メールアドレス</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">support@voice2contentai.com</td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">販売URL</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">https://app.voice2contentai.com</td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">販売価格</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">各プランページに表示された金額</td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">商品・サービス内容</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">
-                    音声ファイルをアップロードすることで、自動文字起こし、SNS投稿文生成、
-                    YouTubeショート台本生成、ブログ記事生成、要約生成などを行うWebサービスです。
-                </td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">支払方法</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">クレジットカード決済（Stripe）</td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">サービス提供時期</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">決済完了後、直ちに利用可能</td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">返品・キャンセル</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">
-                    デジタルサービスの性質上、決済後の返金には原則対応しておりません。
-                    サブスクリプションは次回更新日前までに解約できます。
-                </td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">追加料金</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">
-                    インターネット通信料はお客様のご負担となります。
-                </td>
-            </tr>
-            <tr>
-                <th style="border:1px solid #f3d9c5; padding:12px;">動作環境</th>
-                <td style="border:1px solid #f3d9c5; padding:12px;">
-                    インターネット接続環境およびWebブラウザが必要です。
-                </td>
-            </tr>
-        </table>
-
-        <br>
-        <a class="btn sub" href="/">トップへ戻る</a>
-    </div>
-    """))
-
 
 @app.post("/stripe-webhook")
 async def stripe_webhook(request: Request):
@@ -1199,3 +1127,30 @@ async def stripe_webhook(request: Request):
     except Exception as e:
         print("WEBHOOK HANDLER ERROR =", repr(e))
         return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.get("/legal", response_class=HTMLResponse)
+def legal_page():
+    return HTMLResponse(page("特定商取引法に基づく表記", """
+    <div class="card">
+        <h1>特定商取引法に基づく表記</h1>
+        <table style="width:100%; border-collapse:collapse;">
+            <tr><th>販売事業者</th><td>Voice2Content</td></tr>
+            <tr><th>運営責任者</th><td>泉</td></tr>
+            <tr><th>所在地</th><td>請求があった場合には遅滞なく開示いたします</td></tr>
+            <tr><th>電話番号</th><td>請求があった場合には遅滞なく開示いたします</td></tr>
+            <tr><th>メールアドレス</th><td>support@voice2contentai.com</td></tr>
+            <tr><th>販売URL</th><td>https://app.voice2contentai.com</td></tr>
+            <tr><th>販売価格</th><td>各プランページに表示された金額</td></tr>
+            <tr><th>商品・サービス内容</th><td>音声ファイルをアップロードすることで、自動文字起こし、SNS投稿文生成、YouTubeショート台本生成、ブログ記事生成、要約生成などを行うWebサービスです。</td></tr>
+            <tr><th>追加料金</th><td>インターネット通信料はお客様のご負担となります。</td></tr>
+            <tr><th>支払方法</th><td>クレジットカード決済（Stripe）</td></tr>
+            <tr><th>決済期間</th><td>クレジットカード決済は即時処理されます。</td></tr>
+            <tr><th>サービス提供時期</th><td>決済完了後、直ちにご利用いただけます。</td></tr>
+            <tr><th>返品・キャンセル（通常）</th><td>デジタルサービスの性質上、決済後の返金には原則対応しておりません。サブスクリプションは次回更新日前までに解約可能です。</td></tr>
+            <tr><th>返品・キャンセル（不良時）</th><td>サービスに重大な不具合がある場合は、サポートへご連絡ください。状況に応じて返金または補償対応を行います。</td></tr>
+            <tr><th>動作環境</th><td>インターネット接続環境およびWebブラウザが必要です。</td></tr>
+        </table>
+        <br>
+        <a class="btn sub" href="/">トップへ戻る</a>
+    </div>
+    """))
